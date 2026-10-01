@@ -100,6 +100,7 @@ function joinView(){
  <div class="card cmp"><h3>${esc(TXT.formTitle)}</h3>
  <input id="n" placeholder="Your name"><div class="row3"><input id="c" placeholder="Cluster"><input id="bl" placeholder="Building"><input id="f" placeholder="Flat"></div>
  <p class="e" id="err" style="margin:0"></p><button id="go" style="width:100%;font-size:18px">${esc(TXT.button)}</button></div>`;
+ api("status").then(s=>{const t=document.querySelector(".tg");if(t)t.textContent=s.live?"🟢 "+s.live.name+" is live · "+TXT.tagline:"⏳ No quiz is live right now"}).catch(()=>{});
  document.getElementById("go").onclick=async()=>{
   try{const d=await post("join",{name:n.value,cluster:c.value,building:bl.value,flat:f.value});play(d)}catch(e){err.textContent=e.message}};
 }
@@ -127,33 +128,46 @@ function play(d){
  const iv=setInterval(tick,1000);tick();show();
 }
 
-async function admin(){
+let cur=null;
+async function admin(sel){
+ if(typeof sel==="string")cur=sel;
  if(!sessionStorage.pw){const p=prompt("Admin password");if(!p){location.hash="";return}sessionStorage.pw=p}
- let o;try{o=await api("admin/overview",{},1)}catch(e){delete sessionStorage.pw;app.innerHTML=`<div class="card e">${esc(e.message)} <button onclick="admin()">Retry</button></div>`;return}
- const T=o.questions.length,st=o.status;
- app.innerHTML=`<div class="card"><h2>Admin</h2><p>Status: <b>${st==="live"?"🟢 LIVE":st==="closed"?"🔴 CLOSED":"⚪ Not started"}</b> · ${T} questions · ${o.done.length} submitted · ${o.pending.length} in progress</p>
+ let o;try{o=await api("admin/overview"+(cur?"?quiz="+cur:""),{},1)}catch(e){delete sessionStorage.pw;app.innerHTML=`<div class="card e">${esc(e.message)} <button onclick="admin()">Retry</button></div>`;return}
+ cur=o.qid;const Q=o.quizzes.find(x=>x.id===cur);
+ const head=`<div class="card"><h2>Admin</h2><b>Round:</b> <select id="sel" onchange="admin(this.value)">${o.quizzes.map(x=>`<option value="${x.id}" ${x.id===cur?"selected":""}>${esc(x.name)}</option>`).join("")}</select>
+ <button onclick="newQ()">＋ New round</button></div>`;
+ if(!Q){app.innerHTML=head+`<div class="card m">No rounds yet. Click "New round" to create your first quiz (e.g. Round 1).</div>`;return}
+ const T=o.questions.length,st=Q.status,Z=o.quizzes;
+ const win=o.overall[0];
+ app.innerHTML=head+`<div class="card"><h3>${esc(Q.name)}</h3><p>Status: <b>${st==="live"?"🟢 LIVE":st==="closed"?"🔴 CLOSED":"⚪ Not started"}</b> · ${T} questions · ${o.done.length} submitted · ${o.pending.length} in progress</p>
  ${st!=="live"?`<button class="g" onclick="setS('live')">Start live quiz</button>`:`<button class="d" onclick="setS('closed')">Close quiz</button>`}
- <button class="s" onclick="admin()">Refresh</button> <button class="s" onclick="resetAll()">Reset players</button></div>
- <div class="card"><h3>Add question</h3><textarea id="qt" placeholder="Question text"></textarea>
+ <button class="s" onclick="admin()">Refresh</button> <button class="s" onclick="resetAll()">Reset this round</button> <button class="d" onclick="delQuiz()">Delete round</button>
+ <p class="m">Only one round can be live at a time. Starting a round closes any other live round.</p></div>
+ <div class="card"><h3>Add question to ${esc(Q.name)}</h3><textarea id="qt" placeholder="Question text"></textarea>
  <label class="m">Optional picture or video (max 4 MB)</label><input type="file" id="qf" accept="image/*,video/*">
  ${[0,1,2,3].map(i=>`<label class="o"><input type="radio" name="cor" value="${i}" ${i?"":"checked"}><input class="op" placeholder="Option ${i+1}" style="margin:0"></label>`).join("")}
  <p class="m">Select the radio next to the correct option.</p><p class="e" id="err"></p><button onclick="addQ()">Add question</button></div>
  <div class="card"><h3>Questions</h3>${o.questions.map((q,i)=>`<div style="border-bottom:1px solid var(--b);padding:8px 0"><b>${i+1}. ${esc(q.text)}</b>${media(q)}
  <div class="m">${q.options.map((x,j)=>(j===q.correct?"✅ ":"• ")+esc(x)).join("<br>")}</div><button class="d" onclick="delQ('${q.id}')">Delete</button></div>`).join("")||"<p class=m>None yet</p>"}</div>
- <div class="card"><h3>Leaderboard</h3><div class="tw"><table><tr><th>#</th><th>Name</th><th>Cluster</th><th>Building</th><th>Flat</th><th>Score</th><th>Time</th></tr>
+ <div class="card"><h3>${esc(Q.name)} leaderboard</h3><div class="tw"><table><tr><th>#</th><th>Name</th><th>Cluster</th><th>Bldg</th><th>Flat</th><th>Score</th><th>Time</th></tr>
  ${o.done.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.cluster)}</td><td>${esc(p.building)}</td><td>${esc(p.flat)}</td><td>${p.score}/${T}</td><td>${mmss(p.time)}</td></tr>`).join("")}
- ${o.pending.map(p=>`<tr class="m"><td>–</td><td>${esc(p.name)}</td><td>${esc(p.cluster)}</td><td>${esc(p.building)}</td><td>${esc(p.flat)}</td><td colspan=2>not submitted</td></tr>`).join("")}</table></div>
- <p class="m">Ranked by most correct answers; ties go to the faster player.</p></div>`;
+ ${o.pending.map(p=>`<tr class="m"><td>–</td><td>${esc(p.name)}</td><td>${esc(p.cluster)}</td><td>${esc(p.building)}</td><td>${esc(p.flat)}</td><td colspan=2>not submitted</td></tr>`).join("")}</table></div></div>
+ <div class="card"><h3>🏆 Overall league standings</h3>${win?`<p style="font-size:18px">Leader: <b>${esc(win.name)}</b> (${esc(win.cluster)}, ${esc(win.building)}, ${esc(win.flat)}) with <b>${win.total}</b> points</p>`:"<p class=m>No results yet</p>"}
+ <div class="tw"><table><tr><th>#</th><th>Name</th><th>Cluster</th><th>Bldg</th><th>Flat</th>${Z.map(x=>`<th>${esc(x.name)}</th>`).join("")}<th>Total</th><th>Time</th></tr>
+ ${o.overall.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.cluster)}</td><td>${esc(p.building)}</td><td>${esc(p.flat)}</td>${Z.map(x=>`<td>${p.by[x.id]??"–"}</td>`).join("")}<td><b>${p.total}</b></td><td>${mmss(p.time)}</td></tr>`).join("")}</table></div>
+ <p class="m">Total = sum of scores across all rounds. Ties are broken by the lower total time. A player must use the same name, cluster, building and flat in every round to be counted together.</p></div>`;
 }
-const setS=async s=>{if(s==="closed"&&!confirm("Close the quiz? Players can no longer submit."))return;await post("admin/status",{status:s},1);admin()};
-const resetAll=async()=>{if(confirm("Delete all players and set quiz to not started?")){await post("admin/reset",{},1);admin()}};
-const delQ=async id=>{if(confirm("Delete question?")){await api("admin/question?id="+id,{method:"DELETE"},1);admin()}};
+const newQ=async()=>{const n=prompt("Round name (e.g. Round 1)");if(!n)return;const r=await post("admin/quiz",{name:n},1);admin(r.id)};
+const setS=async s=>{if(s==="closed"&&!confirm("Close this quiz? Players can no longer submit."))return;await post("admin/status",{id:cur,status:s},1);admin()};
+const resetAll=async()=>{if(confirm("Delete all players of THIS round and set it to not started?")){await post("admin/reset",{quiz:cur},1);admin()}};
+const delQuiz=async()=>{if(confirm("Delete this round with its questions and results? Overall totals will change.")){await post("admin/deletequiz",{id:cur},1);cur=null;admin()}};
+const delQ=async id=>{if(confirm("Delete question?")){await api(`admin/question?quiz=${cur}&id=${id}`,{method:"DELETE"},1);admin()}};
 async function addQ(){
  const options=[...document.querySelectorAll(".op")].map(x=>x.value.trim()),f=qf.files[0],text=qt.value.trim();
  if(options.some(x=>!x))return err.textContent="Fill all 4 options.";
  if(!text&&!f)return err.textContent="Add question text or a file.";
  if(f&&f.size>4e6)return err.textContent="File too large (max 4 MB).";
- const b={text,options,correct:+document.querySelector('input[name="cor"]:checked').value};
+ const b={quiz:cur,text,options,correct:+document.querySelector('input[name="cor"]:checked').value};
  if(f)b.media={type:f.type,data:await new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)})};
  try{await post("admin/question",b,1);admin()}catch(e){err.textContent=e.message}
 }
