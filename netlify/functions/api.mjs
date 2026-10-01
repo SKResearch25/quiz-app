@@ -23,11 +23,11 @@ export default async (req) => {
   // player join / resume
   if (p === "join" && m === "POST") {
     if (cfg.status !== "live") return J({ error: cfg.status === "closed" ? "This quiz is closed." : "Quiz is not live yet." }, 403);
-    const f = ["name", "cluster", "flat"].map((k) => String(body[k] || "").trim().slice(0, 60));
+    const f = ["name", "cluster", "building", "flat"].map((k) => String(body[k] || "").trim().slice(0, 60));
     if (f.some((x) => !x)) return J({ error: "Fill in all fields." }, 400);
     const key = "p:" + encodeURIComponent(f.map((x) => x.toLowerCase()).join("|"));
     let rec = await get(key, null);
-    if (!rec) { rec = { name: f[0], cluster: f[1], flat: f[2], start: Date.now() }; await s.setJSON(key, rec); }
+    if (!rec) { rec = { name: f[0], cluster: f[1], building: f[2], flat: f[3], start: Date.now() }; await s.setJSON(key, rec); }
     if (rec.done) return J({ error: "You have already submitted this quiz." }, 409);
     const remaining = Math.max(0, LIMIT - Math.floor((Date.now() - rec.start) / 1000));
     return J({ key, remaining, questions: qs.map(pub) });
