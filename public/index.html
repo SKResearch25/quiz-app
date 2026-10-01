@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Community Quiz</title>
+<style>
+:root{--bg:#f6f7fb;--c:#fff;--t:#1c2033;--m:#6b7089;--a:#4f46e5;--b:#e2e4ee}
+@media(prefers-color-scheme:dark){:root{--bg:#12131a;--c:#1c1e2a;--t:#eceef7;--m:#9a9fb8;--b:#2e3146}}
+*{box-sizing:border-box}body{margin:0;font:16px system-ui,sans-serif;background:var(--bg);color:var(--t)}
+main{max-width:720px;margin:0 auto;padding:16px}
+.card{background:var(--c);border:1px solid var(--b);border-radius:14px;padding:18px;margin-bottom:14px}
+input,select,textarea{width:100%;padding:11px;margin:5px 0 10px;border:1px solid var(--b);border-radius:9px;background:var(--bg);color:var(--t);font:inherit}
+button{background:var(--a);color:#fff;border:0;border-radius:9px;padding:11px 18px;font:inherit;cursor:pointer;margin:2px}
+button.s{background:var(--m)}button.d{background:#dc2626}button.g{background:#16a34a}
+img,video{max-width:100%;border-radius:10px;margin:8px 0}
+label.o{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--b);border-radius:9px;margin:6px 0;cursor:pointer}
+label.o input{width:auto;margin:0}
+#timer{position:sticky;top:0;background:var(--a);color:#fff;text-align:center;padding:10px;font-size:20px;font-weight:600;z-index:5}
+table{width:100%;border-collapse:collapse}td,th{padding:8px;border-bottom:1px solid var(--b);text-align:left}
+.e{color:#dc2626}.m{color:var(--m);font-size:14px}.tw{overflow-x:auto}
+</style></head><body><div id="timer" hidden></div><main id="app"></main>
+<script>
+const app=document.getElementById("app"),tm=document.getElementById("timer");
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const api=async(p,o={},adm)=>{const r=await fetch("/api/"+p,{...o,headers:{"content-type":"application/json",...(adm?{"x-admin":sessionStorage.pw||""}:{})}});
+ const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"Error");return d};
+const post=(p,b,adm)=>api(p,{method:"POST",body:JSON.stringify(b)},adm);
+const mmss=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+const media=q=>!q.mediaId?"":q.mediaType==="video"?`<video controls playsinline src="/api/media/${q.mediaId}"></video>`:`<img src="/api/media/${q.mediaId}">`;
+
+function route(){tm.hidden=true;location.hash==="#admin"?admin():joinView()}
+addEventListener("hashchange",route);route();
+
+function joinView(){
+ app.innerHTML=`<div class="card"><h2>🏆 Quiz Time</h2><p class="m">You get 10 minutes to answer all questions once you start.</p>
+ <input id="n" placeholder="Your name"><input id="c" placeholder="Cluster"><input id="f" placeholder="Flat number">
+ <p class="e" id="err"></p><button id="go">Start Quiz</button></div>`;
+ document.getElementById("go").onclick=async()=>{
+  try{const d=await post("join",{name:n.value,cluster:c.value,flat:f.value});play(d)}catch(e){err.textContent=e.message}};
+}
+function play(d){
+ const end=Date.now()+d.remaining*1000;let sent=false;
+ app.innerHTML=d.questions.map((q,i)=>`<div class="card"><b>${i+1}. ${esc(q.text)}</b>${media(q)}`+
+  q.options.map((o,j)=>`<label class="o"><input type="radio" name="${q.id}" value="${j}"> ${esc(o)}</label>`).join("")+`</div>`).join("")+
+  `<p class="e" id="err"></p><button id="sub">Submit answers</button>`;
+ const submit=async()=>{if(sent)return;sent=true;clearInterval(iv);
+  const answers={};d.questions.forEach(q=>{const x=document.querySelector(`input[name="${q.id}"]:checked`);if(x)answers[q.id]=+x.value});
+  try{await post("submit",{key:d.key,answers});tm.hidden=true;
+   app.innerHTML=`<div class="card"><h2>✅ Thank you!</h2><p>Your answers have been submitted. Results will be announced by the organiser.</p></div>`;scrollTo(0,0)}
+  catch(e){sent=false;err.textContent=e.message}};
+ document.getElementById("sub").onclick=()=>confirm("Submit now? You can't change answers later.")&&submit();
+ tm.hidden=false;const tick=()=>{const r=Math.max(0,Math.round((end-Date.now())/1000));tm.textContent="⏱ "+mmss(r);if(r<=0)submit()};
+ const iv=setInterval(tick,1000);tick();
+}
+
+async function admin(){
+ if(!sessionStorage.pw){const p=prompt("Admin password");if(!p){location.hash="";return}sessionStorage.pw=p}
+ let o;try{o=await api("admin/overview",{},1)}catch(e){delete sessionStorage.pw;app.innerHTML=`<div class="card e">${esc(e.message)} <button onclick="admin()">Retry</button></div>`;return}
+ const T=o.questions.length,st=o.status;
+ app.innerHTML=`<div class="card"><h2>Admin</h2><p>Status: <b>${st==="live"?"🟢 LIVE":st==="closed"?"🔴 CLOSED":"⚪ Not started"}</b> · ${T} questions · ${o.done.length} submitted · ${o.pending.length} in progress</p>
+ ${st!=="live"?`<button class="g" onclick="setS('live')">Start live quiz</button>`:`<button class="d" onclick="setS('closed')">Close quiz</button>`}
+ <button class="s" onclick="admin()">Refresh</button> <button class="s" onclick="resetAll()">Reset players</button></div>
+ <div class="card"><h3>Add question</h3><textarea id="qt" placeholder="Question text"></textarea>
+ <label class="m">Optional picture or video (max 4 MB)</label><input type="file" id="qf" accept="image/*,video/*">
+ ${[0,1,2,3].map(i=>`<label class="o"><input type="radio" name="cor" value="${i}" ${i?"":"checked"}><input class="op" placeholder="Option ${i+1}" style="margin:0"></label>`).join("")}
+ <p class="m">Select the radio next to the correct option.</p><p class="e" id="err"></p><button onclick="addQ()">Add question</button></div>
+ <div class="card"><h3>Questions</h3>${o.questions.map((q,i)=>`<div style="border-bottom:1px solid var(--b);padding:8px 0"><b>${i+1}. ${esc(q.text)}</b>${media(q)}
+ <div class="m">${q.options.map((x,j)=>(j===q.correct?"✅ ":"• ")+esc(x)).join("<br>")}</div><button class="d" onclick="delQ('${q.id}')">Delete</button></div>`).join("")||"<p class=m>None yet</p>"}</div>
+ <div class="card"><h3>Leaderboard</h3><div class="tw"><table><tr><th>#</th><th>Name</th><th>Cluster</th><th>Flat</th><th>Score</th><th>Time</th></tr>
+ ${o.done.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.cluster)}</td><td>${esc(p.flat)}</td><td>${p.score}/${T}</td><td>${mmss(p.time)}</td></tr>`).join("")}
+ ${o.pending.map(p=>`<tr class="m"><td>–</td><td>${esc(p.name)}</td><td>${esc(p.cluster)}</td><td>${esc(p.flat)}</td><td colspan=2>not submitted</td></tr>`).join("")}</table></div>
+ <p class="m">Ranked by most correct answers; ties go to the faster player.</p></div>`;
+}
+const setS=async s=>{if(s==="closed"&&!confirm("Close the quiz? Players can no longer submit."))return;await post("admin/status",{status:s},1);admin()};
+const resetAll=async()=>{if(confirm("Delete all players and set quiz to not started?")){await post("admin/reset",{},1);admin()}};
+const delQ=async id=>{if(confirm("Delete question?")){await api("admin/question?id="+id,{method:"DELETE"},1);admin()}};
+async function addQ(){
+ const options=[...document.querySelectorAll(".op")].map(x=>x.value.trim()),f=qf.files[0],text=qt.value.trim();
+ if(options.some(x=>!x))return err.textContent="Fill all 4 options.";
+ if(!text&&!f)return err.textContent="Add question text or a file.";
+ if(f&&f.size>4e6)return err.textContent="File too large (max 4 MB).";
+ const b={text,options,correct:+document.querySelector('input[name="cor"]:checked').value};
+ if(f)b.media={type:f.type,data:await new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)})};
+ try{await post("admin/question",b,1);admin()}catch(e){err.textContent=e.message}
+}
+</script></body></html>
