@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Community Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Carlito:wght@700&display=swap" rel="stylesheet"><title>Piramal Vaikunth Quiz League</title>
 <style>
 :root{--bg:#f6f7fb;--c:#fff;--t:#1c2033;--m:#6b7089;--a:#4f46e5;--b:#e2e4ee}
 @media(prefers-color-scheme:dark){:root{--bg:#12131a;--c:#1c1e2a;--t:#eceef7;--m:#9a9fb8;--b:#2e3146}}
@@ -17,8 +17,70 @@ label.o input{width:auto;margin:0}
 #timer{position:sticky;top:0;background:var(--a);color:#fff;text-align:center;padding:10px;font-size:20px;font-weight:600;z-index:5}
 table{width:100%;border-collapse:collapse}td,th{padding:8px;border-bottom:1px solid var(--b);text-align:left}
 .e{color:#dc2626}.m{color:var(--m);font-size:14px}.tw{overflow-x:auto}
+
+body.q{--bg:#e8f6f3;--c:#fff;--t:#1c2a33;--m:#5b6b75;--b:#d5e4e1;--a:#f59e0b;background:linear-gradient(#0b1f3a,#0d3b4f 55%,#0b3d33);background-attachment:fixed;min-height:100vh}
+body.q button{color:#2b1d00;font-weight:700}body.q button.s{background:#64748b;color:#fff}body.q button.g{background:#16a34a;color:#fff}
+body.q #timer{color:#2b1d00}button:disabled{opacity:.35;cursor:default}
+.hero{text-align:center;padding:22px 6px 6px}.hero h1{font-size:34px;margin:6px 0;line-height:1.1}.hero h1 span{color:#f5b301}
+.hero p{color:var(--m);margin:6px 0 14px}
+.ic{display:flex;justify-content:center;gap:14px;font-size:44px;margin:8px 0}
+.ic i{font-style:normal;animation:fl 3s ease-in-out infinite;filter:drop-shadow(0 6px 10px #0006)}
+.ic i:nth-child(2){animation-delay:.5s}.ic i:nth-child(3){animation-delay:1s}.ic i:nth-child(4){animation-delay:1.5s}
+@keyframes fl{50%{transform:translateY(-10px)}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 16px}
+.chips b{background:#ffffff14;border:1px solid var(--b);border-radius:20px;padding:6px 12px;font-size:14px;font-weight:500}
+.trophy{font-size:64px;text-align:center}
+.bar{height:8px;background:var(--b);border-radius:6px;margin:8px 0 12px}.bar i{display:block;height:100%;background:#f5b301;border-radius:6px;transition:width .3s}
+.nav{display:flex;justify-content:space-between;margin-top:10px}
+.hero p,.chips b{color:#fff}.chips b{background:#ffffff26;border-color:#ffffff66}
+.tree{position:relative;max-width:420px;margin:0 auto}.tree svg{width:100%;display:block}
+.ttl{position:absolute;left:0;right:0;top:14%;text-align:center;margin:0}
+.ttl small{display:block;color:#ffe08a;font-size:clamp(14px,4.5vw,20px);letter-spacing:1px;font-weight:700}
+.ttl span{display:block;color:#fff;font-size:clamp(26px,8.5vw,40px);font-weight:800;line-height:1;text-shadow:0 2px 0 #1b6b2d}
+.fb{position:absolute;display:flex;flex-direction:column;align-items:center;animation:fl 3s ease-in-out infinite;--s:clamp(46px,13.5vw,60px)}
+.fb b{width:var(--s);height:var(--s);border-radius:50%;background:#fff;border:3px solid #ffd43b;display:flex;align-items:center;justify-content:center;font-size:calc(var(--s)*.52);box-shadow:0 5px 12px #0004}
+.fb small{margin-top:3px;font-size:clamp(9px,2.7vw,11px);font-weight:800;color:#fff;background:#0b5d4acc;border-radius:8px;padding:1px 6px;white-space:nowrap}
+.hd{background:#102a43;border:3px solid #ffd43b;border-radius:18px;padding:12px 8px 10px;text-align:center;box-shadow:0 6px 0 #0b1f33,0 10px 20px #0004}
+.hd small,.hd span{font-family:Calibri,Carlito,'Segoe UI',Arial,sans-serif;font-weight:700!important}.hd small{display:block;color:#ffd43b;font-size:clamp(17px,5.4vw,24px);font-weight:900;letter-spacing:3px;text-transform:uppercase}
+.hd span{display:block;color:#fff;font-size:clamp(34px,11.5vw,52px);font-weight:900;line-height:1;letter-spacing:1px;text-transform:uppercase;text-shadow:0 3px 0 #2f9e44}
+.tg{text-align:center;color:#fff;font-weight:700;margin:10px 0 0;font-size:14px}
+.bub{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 1.5%;margin:12px 0 4px}
+.bub .fb{position:static;width:18.5%;--s:clamp(42px,12.5vw,56px)}
+.bub .fb small{font-size:clamp(8.5px,2.5vw,10.5px);padding:1px 4px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.cmp{padding:14px}.cmp input{margin:4px 0 8px}.cmp h3{margin:0 0 4px;font-size:16px}
+.hd{position:relative;overflow:hidden;margin:6px 6px 10px;padding:12px 42px 10px;background:radial-gradient(circle at 18% 0,#6d4cff 0,transparent 55%),radial-gradient(circle at 90% 100%,#0ea5e9 0,transparent 50%),linear-gradient(135deg,#1b1464,#0d47a1);outline:2px solid #ffd43b99;outline-offset:4px;box-shadow:0 0 24px #ffd43b55,0 8px 0 #0b1f33}
+.hd::after{content:"";position:absolute;top:0;left:-60%;width:35%;height:100%;background:linear-gradient(100deg,transparent,#ffffff3d,transparent);animation:sh 4.5s ease-in-out infinite}
+@keyframes sh{60%,100%{left:140%}}@keyframes tw{50%{opacity:.25;transform:scale(.7)}}
+.hd small{display:flex;align-items:center;gap:8px;color:#fff;font-size:clamp(14px,4.6vw,20px);letter-spacing:2px}
+.hd small::before,.hd small::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,transparent,#ffd43b)}
+.hd small::after{transform:scaleX(-1)}
+.hd span{margin-top:2px;background:linear-gradient(#fff7c4,#ffd43b 55%,#f59e0b);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 3px 0 #5c3500)}
+.hd i{position:absolute;top:50%;transform:translateY(-50%);font-style:normal;font-size:30px;z-index:1;filter:drop-shadow(0 3px 4px #0006)}
+.hd i.l{left:8px}.hd i.r{right:8px}
+.hd u{position:absolute;text-decoration:none;color:#ffe58a;font-size:12px;animation:tw 2s ease-in-out infinite}
+body.q{--bg:#0a1430b3;--c:#ffffff12;--t:#f3f6ff;--m:#b8c4d6;--b:#ffffff30;
+background:radial-gradient(circle at 12% 8%,#4a2fb066,transparent 42%),radial-gradient(circle at 90% 35%,#0ea5e955,transparent 42%),radial-gradient(circle at 20% 95%,#10b98144,transparent 40%),
+radial-gradient(#ffffff66 1px,transparent 1.6px) 0 0/80px 80px,radial-gradient(#ffd43b77 1px,transparent 1.6px) 40px 40px/80px 80px,linear-gradient(#0b1f3a,#0d2d4f 55%,#0b3a3a);background-attachment:fixed}
+body.q .card{background:linear-gradient(160deg,#ffffff1c,#ffffff08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid #ffd43b66;border-radius:18px;box-shadow:0 0 22px #ffd43b22,0 12px 30px #0006}
+body.q .cmp h3{color:#ffd43b;font-size:17px;letter-spacing:.5px}body.q .cmp h3::before{content:"✨ "}
+body.q input,body.q textarea{border:1px solid #ffffff3d;color:#fff;border-radius:11px}
+body.q input::placeholder{color:#9fb0c8}
+body.q input:focus{outline:none;border-color:#ffd43b;box-shadow:0 0 0 3px #ffd43b33}
+body.q button:not(.s):not(.g){background:linear-gradient(#ffe066,#f59e0b);box-shadow:0 5px 0 #a15c00;border-radius:12px}
+body.q button:not(.s):not(.g):active{transform:translateY(3px);box-shadow:0 2px 0 #a15c00}
+body.q button.g{box-shadow:0 5px 0 #0d6b2f;border-radius:12px}body.q button.s{box-shadow:0 5px 0 #3d4a5c;border-radius:12px}
+body.q label.o{background:#ffffff0d;border-radius:12px;transition:.15s}
+body.q label.o:has(input:checked){border-color:#ffd43b;background:#ffd43b24;box-shadow:0 0 0 2px #ffd43b55}
+body.q #timer{background:linear-gradient(90deg,#f59e0b,#ffd43b,#f59e0b);box-shadow:0 4px 14px #0006}
+body.q .bar{background:#ffffff26}
+body.q .e{color:#ff8787}
 </style></head><body><div id="timer" hidden></div><main id="app"></main>
 <script>
+/* ===== EDIT YOUR TEXT HERE ===== */
+const TXT={title1:"Piramal Vaikunth",title2:"Quiz League",tagline:"⏱ You get 10 minutes",
+ badges:["⏱ 10 minutes","🧠 Brain teasers","🥇 Ranked by score & speed"],formTitle:"Enter your details",button:"Start Quiz 🚀"};
+/* ================================ */
 const app=document.getElementById("app"),tm=document.getElementById("timer");
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const api=async(p,o={},adm)=>{const r=await fetch("/api/"+p,{...o,headers:{"content-type":"application/json",...(adm?{"x-admin":sessionStorage.pw||""}:{})}});
@@ -27,29 +89,42 @@ const post=(p,b,adm)=>api(p,{method:"POST",body:JSON.stringify(b)},adm);
 const mmss=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
 const media=q=>!q.mediaId?"":q.mediaType==="video"?`<video controls playsinline src="/api/media/${q.mediaId}"></video>`:`<img src="/api/media/${q.mediaId}">`;
 
-function route(){tm.hidden=true;location.hash==="#admin"?admin():joinView()}
+function route(){tm.hidden=true;const a=location.hash==="#admin";document.body.className=a?"":"q";a?admin():joinView()}
 addEventListener("hashchange",route);route();
 
 function joinView(){
- app.innerHTML=`<div class="card"><h2>🏆 Quiz Time</h2><p class="m">You get 10 minutes to answer all questions once you start.</p>
- <input id="n" placeholder="Your name"><input id="c" placeholder="Cluster"><input id="f" placeholder="Flat number">
- <p class="e" id="err"></p><button id="go">Start Quiz</button></div>`;
+ const em=[["📚","Literature"],["🎬","Movies"],["🧑‍🔬","Science"],["🏏","Sports"],["🧑‍💼","Business"],["🧑‍🚀","Space"],["🌍","World"],["🏛️","History"],["💡","Inventions"],["🏆","Champions"]];
+ app.innerHTML=`<div class="hd"><i class="l">🏆</i><i class="r">🎓</i><u style="top:6px;left:46%">✦</u><u style="bottom:6px;left:12%;animation-delay:.7s">✦</u><u style="bottom:8px;right:14%;animation-delay:1.3s">✦</u><small>✦ ${esc(TXT.title1)} ✦</small><span>${esc(TXT.title2)}</span></div>
+ <div class="bub">${em.map(([e,t],k)=>`<span class="fb" style="animation-delay:${k*.3}s"><b>${e}</b><small>${t}</small></span>`).join("")}</div>
+ <p class="tg">${esc(TXT.tagline)}</p>
+ <div class="card cmp"><h3>${esc(TXT.formTitle)}</h3>
+ <input id="n" placeholder="Your name"><div class="row3"><input id="c" placeholder="Cluster"><input id="bl" placeholder="Building"><input id="f" placeholder="Flat"></div>
+ <p class="e" id="err" style="margin:0"></p><button id="go" style="width:100%;font-size:18px">${esc(TXT.button)}</button></div>`;
  document.getElementById("go").onclick=async()=>{
-  try{const d=await post("join",{name:n.value,cluster:c.value,flat:f.value});play(d)}catch(e){err.textContent=e.message}};
+  try{const d=await post("join",{name:n.value,cluster:c.value,building:bl.value,flat:f.value});play(d)}catch(e){err.textContent=e.message}};
 }
 function play(d){
- const end=Date.now()+d.remaining*1000;let sent=false;
- app.innerHTML=d.questions.map((q,i)=>`<div class="card"><b>${i+1}. ${esc(q.text)}</b>${media(q)}`+
-  q.options.map((o,j)=>`<label class="o"><input type="radio" name="${q.id}" value="${j}"> ${esc(o)}</label>`).join("")+`</div>`).join("")+
-  `<p class="e" id="err"></p><button id="sub">Submit answers</button>`;
+ const end=Date.now()+d.remaining*1000,Q=d.questions,ans={};let i=0,sent=false;
+ if(!Q.length){app.innerHTML=`<div class="card">No questions yet. Please check back soon.</div>`;return}
+ const $=x=>document.getElementById(x);
  const submit=async()=>{if(sent)return;sent=true;clearInterval(iv);
-  const answers={};d.questions.forEach(q=>{const x=document.querySelector(`input[name="${q.id}"]:checked`);if(x)answers[q.id]=+x.value});
-  try{await post("submit",{key:d.key,answers});tm.hidden=true;
-   app.innerHTML=`<div class="card"><h2>✅ Thank you!</h2><p>Your answers have been submitted. Results will be announced by the organiser.</p></div>`;scrollTo(0,0)}
-  catch(e){sent=false;err.textContent=e.message}};
- document.getElementById("sub").onclick=()=>confirm("Submit now? You can't change answers later.")&&submit();
+  try{await post("submit",{key:d.key,answers:ans});tm.hidden=true;
+   app.innerHTML=`<div class="card" style="text-align:center"><div class="trophy">🏆</div><h2>Thank you!</h2><p>Your answers have been submitted. Results will be announced by the organiser.</p></div>`;scrollTo(0,0)}
+  catch(e){sent=false;$("err").textContent=e.message}};
+ const show=()=>{const q=Q[i],last=i===Q.length-1;
+  app.innerHTML=`<div class="card"><div class="m">Question ${i+1} of ${Q.length}</div><div class="bar"><i style="width:${(i+1)/Q.length*100}%"></i></div>
+  <h3>${esc(q.text)}</h3>${media(q)}`+
+  q.options.map((o,j)=>`<label class="o"><input type="radio" name="o" value="${j}" ${ans[q.id]===j?"checked":""}> ${esc(o)}</label>`).join("")+
+  `<p class="e" id="err"></p><div class="nav"><button class="s" id="bk" ${i?"":"disabled"}>← Back</button>`+
+  (last?`<button class="g" id="sub">Submit ✔</button>`:`<button id="nx">Next →</button>`)+`</div></div>`;
+  app.querySelectorAll("input[name=o]").forEach(x=>x.onchange=()=>ans[q.id]=+x.value);
+  $("bk").onclick=()=>{i--;show()};
+  if(last)$("sub").onclick=()=>{const u=Q.length-Object.keys(ans).length;
+   if(confirm((u?u+" question(s) unanswered. ":"")+"Submit now? You can't change answers later."))submit()};
+  else $("nx").onclick=()=>{i++;show()};
+  scrollTo(0,0)};
  tm.hidden=false;const tick=()=>{const r=Math.max(0,Math.round((end-Date.now())/1000));tm.textContent="⏱ "+mmss(r);if(r<=0)submit()};
- const iv=setInterval(tick,1000);tick();
+ const iv=setInterval(tick,1000);tick();show();
 }
 
 async function admin(){
@@ -65,9 +140,9 @@ async function admin(){
  <p class="m">Select the radio next to the correct option.</p><p class="e" id="err"></p><button onclick="addQ()">Add question</button></div>
  <div class="card"><h3>Questions</h3>${o.questions.map((q,i)=>`<div style="border-bottom:1px solid var(--b);padding:8px 0"><b>${i+1}. ${esc(q.text)}</b>${media(q)}
  <div class="m">${q.options.map((x,j)=>(j===q.correct?"✅ ":"• ")+esc(x)).join("<br>")}</div><button class="d" onclick="delQ('${q.id}')">Delete</button></div>`).join("")||"<p class=m>None yet</p>"}</div>
- <div class="card"><h3>Leaderboard</h3><div class="tw"><table><tr><th>#</th><th>Name</th><th>Cluster</th><th>Flat</th><th>Score</th><th>Time</th></tr>
- ${o.done.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.cluster)}</td><td>${esc(p.flat)}</td><td>${p.score}/${T}</td><td>${mmss(p.time)}</td></tr>`).join("")}
- ${o.pending.map(p=>`<tr class="m"><td>–</td><td>${esc(p.name)}</td><td>${esc(p.cluster)}</td><td>${esc(p.flat)}</td><td colspan=2>not submitted</td></tr>`).join("")}</table></div>
+ <div class="card"><h3>Leaderboard</h3><div class="tw"><table><tr><th>#</th><th>Name</th><th>Cluster</th><th>Building</th><th>Flat</th><th>Score</th><th>Time</th></tr>
+ ${o.done.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.cluster)}</td><td>${esc(p.building)}</td><td>${esc(p.flat)}</td><td>${p.score}/${T}</td><td>${mmss(p.time)}</td></tr>`).join("")}
+ ${o.pending.map(p=>`<tr class="m"><td>–</td><td>${esc(p.name)}</td><td>${esc(p.cluster)}</td><td>${esc(p.building)}</td><td>${esc(p.flat)}</td><td colspan=2>not submitted</td></tr>`).join("")}</table></div>
  <p class="m">Ranked by most correct answers; ties go to the faster player.</p></div>`;
 }
 const setS=async s=>{if(s==="closed"&&!confirm("Close the quiz? Players can no longer submit."))return;await post("admin/status",{status:s},1);admin()};
